@@ -69,13 +69,19 @@
   (let ((pdf-file-path (concat (file-name-sans-extension buffer-file-name) ".pdf")))
     (progn
       (message "Opening '%s' ..." pdf-file-path)
-      (async-shell-command (format "%s %s\n" satysfi-pdf-viewer-command pdf-file-path)))))
+      (let ((escaped-pdf-file-path
+             (shell-quote-argument pdf-file-path)))
+        (async-shell-command
+         (format "%s %s\n" satysfi-pdf-viewer-command escaped-pdf-file-path))))))
 
 (defun satysfi-mode/typeset ()
   (interactive)
   (progn
     (message "Typesetting '%s' ..." buffer-file-name)
-    (async-shell-command (format "%s %s\n" satysfi-command buffer-file-name))))
+    (let ((escaped-buffer-file-name
+           (shell-quote-argument buffer-file-name)))
+      (async-shell-command
+       (format "%s %s\n" satysfi-command escaped-buffer-file-name)))))
 
 (defvar satysfi-mode-map (copy-keymap global-map))
 (define-key satysfi-mode-map (kbd "(") 'satysfi-mode/insert-paren-pair)
