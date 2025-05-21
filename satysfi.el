@@ -64,6 +64,13 @@
   (interactive)
   (satysfi-mode/insert-pair-scheme "${" "}"))
 
+(defun satysfi-mode/remove-tramp-prefix (filename)
+  (if (string-match-p ":" filename)
+      ;; If it does, remove the prefix
+      (replace-regexp-in-string ".*:" "" filename)
+    ;; If it doesn't, use the original filename
+    filename))
+
 (defun satysfi-mode/open-pdf ()
   (interactive)
   (let ((pdf-file-path (concat (file-name-sans-extension buffer-file-name) ".pdf")))
@@ -76,12 +83,13 @@
 
 (defun satysfi-mode/typeset ()
   (interactive)
-  (progn
-    (message "Typesetting '%s' ..." buffer-file-name)
-    (let ((escaped-buffer-file-name
-           (shell-quote-argument buffer-file-name)))
-      (async-shell-command
-       (format "%s %s\n" satysfi-command escaped-buffer-file-name)))))
+  (let ((local-file-name (satysfi-mode/remove-tramp-prefix buffer-file-name)))
+    (progn
+      (message "Typesetting '%s' ..." local-file-name)
+      (let ((escaped-buffer-file-name
+             (shell-quote-argument local-file-name)))
+        (async-shell-command
+         (format "%s %s\n" satysfi-command escaped-buffer-file-name))))))
 
 (defvar satysfi-mode-map (copy-keymap global-map))
 (define-key satysfi-mode-map (kbd "(") 'satysfi-mode/insert-paren-pair)
