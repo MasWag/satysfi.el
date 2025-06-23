@@ -13,7 +13,7 @@
   :type 'file
   :group 'satysfi)
 
-(defcustom satysfi-command "satysfi -b"
+(defcustom satysfi-command "opam exec satysfi -- -b"
   "Command to run SATySFi."
   :type 'file
   :group 'satysfi)
