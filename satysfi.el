@@ -4,6 +4,19 @@
 
 (provide 'satysfi)
 
+(defgroup satysfi nil
+  "Major mode for SATySFi."
+  :group 'text)
+
+(defcustom satysfi-pdf-viewer-command "open"
+  "Command to open the PDF file."
+  :type 'file
+  :group 'satysfi)
+
+(defcustom satysfi-command "satysfi -b"
+  "Command to run SATySFi."
+  :type 'file
+  :group 'satysfi)
 
 (defface satysfi-inline-command-face
   '((t (:foreground "#8888ff")))
@@ -24,10 +37,6 @@
 (defface satysfi-literal-area
   '((t (:foreground "#ffff44")))
   "SATySFi literal area")
-
-(defvar satysfi-pdf-viewer-command "open")
-
-(defvar satysfi-command "satysfi -b")
 
 (defun satysfi-mode/insert-pair-scheme (open-string close-string)
   (cond ((use-region-p)
