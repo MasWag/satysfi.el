@@ -18,6 +18,11 @@
   :type 'file
   :group 'satysfi)
 
+(defcustom satysfi-compilation-window-height 10
+  "Number of lines in a compilation window of SATySFi.
+If nil, use Emacs default."
+  :type '(choice (const nil) integer))
+
 (defface satysfi-inline-command-face
   '((t (:foreground "#8888ff")))
   "SATySFi inline command")
@@ -94,11 +99,23 @@
   (interactive)
   (let ((local-file-name (satysfi-mode/remove-tramp-prefix buffer-file-name)))
     (progn
+      (defun satysfi-mode/compilation-hook ()
+        (when (not (get-buffer-window "*compilation*"))
+          (save-selected-window
+            (save-excursion
+              (let* ((w (split-window-vertically))
+                     (h (window-height w)))
+                (select-window w)
+                (switch-to-buffer "*compilation*")
+                (shrink-window (- h compilation-window-height)))))))
+      (add-hook 'compilation-mode-hook 'satysfi-mode/compilation-hook)
       (message "Typesetting '%s' ..." local-file-name)
       (let ((escaped-buffer-file-name
-             (shell-quote-argument local-file-name)))
-        (async-shell-command
-         (format "%s %s\n" satysfi-command escaped-buffer-file-name))))))
+             (shell-quote-argument local-file-name))
+            (compilation-window-height satysfi-compilation-window-height))
+        (compilation-start
+         (format "%s %s\n" satysfi-command escaped-buffer-file-name)))
+      (remove-hook 'compilation-mode-hook 'satysfi-mode/compilation-hook))))
 
 (defvar satysfi-mode-map (copy-keymap global-map))
 (define-key satysfi-mode-map (kbd "(") 'satysfi-mode/insert-paren-pair)
